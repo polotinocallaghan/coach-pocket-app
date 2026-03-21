@@ -43,8 +43,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     console.error("[AuthContext] Firestore sync failed:", err);
                 }
                 
-                // Set cookie for middleware
-                document.cookie = "tf_auth_status=authenticated; path=/; max-age=2592000; SameSite=Lax; Secure";
+                // Set cookie for middleware (removed Secure to allow localhost testing; Vercel handles HTTPS automatically)
+                document.cookie = "tf_auth_status=authenticated; path=/; max-age=2592000; SameSite=Lax";
                 setFirestoreReady(true);
             } else {
                 // Guest / logged out — just use local state
