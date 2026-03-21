@@ -1,0 +1,45 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Auditoría Infraestructura Cloud (Firebase/Vercel)",
+      "status": "COMPLETED",
+      "plan_approved": true,
+      "assigned_to": "Arquitecto",
+      "dependencies": []
+    },
+    {
+      "id": 2,
+      "title": "Auditoría Seguridad y Privacidad (Roles/Reglas Firestore)",
+      "status": "COMPLETED",
+      "plan_approved": true,
+      "assigned_to": "Backend",
+      "dependencies": []
+    },
+    {
+      "id": 3,
+      "title": "Estrategia Rendimiento de Vídeo y Storage",
+      "status": "PENDING",
+      "plan_approved": false,
+      "assigned_to": "Arquitecto",
+      "dependencies": []
+    },
+    {
+      "id": 4,
+      "title": "Auditoría UX (Fluidez Táctil y Navegación)",
+      "status": "PENDING",
+      "plan_approved": false,
+      "assigned_to": "Frontend",
+      "dependencies": []
+    },
+    {
+      "id": 5,
+      "title": "Reporte de Bugs Críticos para Lanzamiento",
+      "status": "PENDING",
+      "plan_approved": false,
+      "assigned_to": "Revisor",
+      "dependencies": [1, 2, 3, 4]
+    }
+  ],
+  "members": ["Director", "Arquitecto", "Backend", "Frontend", "Investigador", "Revisor"]
+}

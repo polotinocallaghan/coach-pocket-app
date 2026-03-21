@@ -1,0 +1,996 @@
+// Mock data store for immediate functionality
+// Can be replaced with real database calls later
+
+export interface Exercise {
+    id: string;
+    title: string;
+    description: string;
+
+    // Core categorization
+    category: 'basket' | 'drill' | 'points' | 'game';
+    drillType: 'baskets' | 'rallies' | 'points' | 'games';
+
+    // Difficulty and skill level
+    difficulty: 'easy' | 'medium' | 'hard';
+    level: 'beginner' | 'intermediate' | 'advanced' | 'pro';
+
+    // Age and coaching
+    ageGroup: 'kids' | 'teens' | 'adults';
+    needsCoach: boolean;
+
+    // Resource requirements
+    playerCount: number; // 1-10
+    courtsNeeded: number;
+    ballsNeeded: '0-4' | '4-12' | '12+';
+
+    // Focus areas and skills
+    focusAreas: ('forehand' | 'backhand' | 'serve' | 'volley' | 'consistency' | 'footwork')[];
+
+    // Quality and usage metrics
+    rating: number; // 1-5 stars
+    timesUsed: number;
+
+    // Optional metadata
+    duration?: number;
+    focusArea?: string; // Deprecated, use focusAreas
+    courtArea?: string;
+    tags?: string[];
+    diagram?: any;
+    videoUrl?: string;
+    imageUrl?: string;
+    isPublic: boolean;
+    createdAt: Date;
+}
+
+export interface Session {
+    id: string;
+    title: string;
+    description?: string;
+    type: 'practice' | 'match' | 'match-prep';
+    isTemplate: boolean;
+    exercises: SessionExercise[];
+    createdAt: Date;
+}
+
+export interface SessionExercise {
+    id: string;
+    exerciseId: string;
+    block: 'warm-up' | 'technical' | 'situational' | 'competitive' | 'cool-down';
+    order: number;
+    duration?: number;
+    notes?: string;
+}
+
+export interface CalendarEvent {
+    id: string;
+    title: string;
+    date: Date;
+    time?: string;
+    type: 'session' | 'match' | 'practice-match' | 'event';
+    sessionId?: string;
+    notes?: string;
+    completed: boolean;
+}
+
+export interface Playlist {
+    id: string;
+    name: string;
+    description?: string;
+    isPublic: boolean;
+    category?: string;
+    exerciseIds: string[];
+    createdAt: Date;
+}
+
+export interface Team {
+    id: string;
+    name: string;
+    description?: string;
+    type: 'academy' | 'club' | 'university';
+    courtCount: number;
+    members: TeamMember[];
+}
+
+export interface TeamMember {
+    id: string;
+    name: string;
+    role: 'player' | 'assistant-coach';
+    level?: string;
+}
+
+export interface Message {
+    id: string;
+    senderId: string;
+    senderName: string;
+    receiverId: string;
+    content: string;
+    read: boolean;
+    createdAt: Date;
+}
+
+export interface Group {
+    id: string;
+    name: string;
+    description?: string;
+    category: string;
+    memberCount: number;
+}
+
+export interface Opportunity {
+    id: string;
+    type: 'looking-for-players' | 'player-available' | 'coach-position' | 'training-opportunity';
+    title: string;
+    description: string;
+    level?: string;
+    location?: string;
+    active: boolean;
+    createdAt: Date;
+}
+
+// In-memory data store (replace with API calls later)
+class DataStore {
+    private exercises: Exercise[] = [];
+    private sessions: Session[] = [];
+    private calendar: CalendarEvent[] = [];
+    private playlists: Playlist[] = [];
+    private teams: Team[] = [];
+    private messages: Message[] = [];
+    private groups: Group[] = [];
+    private opportunities: Opportunity[] = [];
+
+    constructor() {
+        this.initializeSampleData();
+    }
+
+    private initializeSampleData() {
+        // Sample exercises - 20 varied drills with comprehensive filter data
+        this.exercises = [
+            {
+                id: '1',
+                title: 'Crosscourt Rally',
+                description: 'Players hit crosscourt forehands maintaining depth and consistency',
+                category: 'drill',
+                drillType: 'rallies',
+                difficulty: 'easy',
+                level: 'beginner',
+                ageGroup: 'adults',
+                needsCoach: false,
+                playerCount: 2,
+                courtsNeeded: 1,
+                ballsNeeded: '0-4',
+                focusAreas: ['forehand', 'consistency'],
+                rating: 4,
+                timesUsed: 45,
+                duration: 10,
+                focusArea: 'Forehand',
+                courtArea: 'baseline',
+                tags: ['rally', 'consistency'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '2',
+                title: 'Serve + 1 Attack',
+                description: 'Serve, move forward, and put away the next ball with an aggressive shot',
+                category: 'drill',
+                drillType: 'points',
+                difficulty: 'medium',
+                level: 'intermediate',
+                ageGroup: 'adults',
+                needsCoach: false,
+                playerCount: 2,
+                courtsNeeded: 1,
+                ballsNeeded: '4-12',
+                focusAreas: ['serve', 'footwork'],
+                rating: 5,
+                timesUsed: 62,
+                duration: 15,
+                focusArea: 'Serve',
+                courtArea: 'full-court',
+                tags: ['serve', 'attack', 'net'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '3',
+                title: 'First to 11 Points',
+                description: 'Competitive game playing to 11 points, win by 2',
+                category: 'game',
+                drillType: 'points',
+                difficulty: 'medium',
+                level: 'intermediate',
+                ageGroup: 'adults',
+                needsCoach: false,
+                playerCount: 2,
+                courtsNeeded: 1,
+                ballsNeeded: '0-4',
+                focusAreas: ['consistency'],
+                rating: 4,
+                timesUsed: 38,
+                duration: 20,
+                focusArea: 'Match Play',
+                courtArea: 'full-court',
+                tags: ['competitive', 'match-play'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '4',
+                title: 'Volley-Volley Exchanges',
+                description: 'Both players at net hitting volleys back and forth',
+                category: 'drill',
+                drillType: 'rallies',
+                difficulty: 'easy',
+                level: 'beginner',
+                ageGroup: 'teens',
+                needsCoach: false,
+                playerCount: 2,
+                courtsNeeded: 1,
+                ballsNeeded: '0-4',
+                focusAreas: ['volley'],
+                rating: 3,
+                timesUsed: 28,
+                duration: 8,
+                focusArea: 'Volley',
+                courtArea: 'service-box',
+                tags: ['volley', 'net-play'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '5',
+                title: 'Down-the-Line Backhand',
+                description: 'Practice hitting backhand down the line with proper technique',
+                category: 'drill',
+                drillType: 'rallies',
+                difficulty: 'medium',
+                level: 'intermediate',
+                ageGroup: 'adults',
+                needsCoach: false,
+                playerCount: 2,
+                courtsNeeded: 1,
+                ballsNeeded: '0-4',
+                focusAreas: ['backhand'],
+                rating: 4,
+                timesUsed: 51,
+                duration: 12,
+                focusArea: 'Backhand',
+                courtArea: 'baseline',
+                tags: ['backhand', 'rally'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '6',
+                title: 'Approach Shot + Volley',
+                description: 'Hit an approach shot and finish at the net with a volley',
+                category: 'drill',
+                drillType: 'points',
+                difficulty: 'hard',
+                level: 'advanced',
+                ageGroup: 'adults',
+                needsCoach: true,
+                playerCount: 2,
+                courtsNeeded: 1,
+                ballsNeeded: '4-12',
+                focusAreas: ['volley', 'footwork'],
+                rating: 5,
+                timesUsed: 34,
+                duration: 15,
+                focusArea: 'Net Play',
+                courtArea: 'full-court',
+                tags: ['approach', 'volley', 'transition'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '7',
+                title: 'Spanish Drill',
+                description: 'One player runs side to side while the other controls the rally',
+                category: 'drill',
+                drillType: 'rallies',
+                difficulty: 'hard',
+                level: 'advanced',
+                ageGroup: 'adults',
+                needsCoach: false,
+                playerCount: 2,
+                courtsNeeded: 1,
+                ballsNeeded: '4-12',
+                focusAreas: ['forehand', 'backhand', 'footwork'],
+                rating: 5,
+                timesUsed: 72,
+                duration: 12,
+                focusArea: 'Footwork',
+                courtArea: 'baseline',
+                tags: ['footwork', 'endurance', 'defense'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '8',
+                title: 'Return Practice',
+                description: 'Practice returning serves from various positions',
+                category: 'drill',
+                drillType: 'baskets',
+                difficulty: 'medium',
+                level: 'intermediate',
+                ageGroup: 'adults',
+                needsCoach: true,
+                playerCount: 2,
+                courtsNeeded: 1,
+                ballsNeeded: '12+',
+                focusAreas: ['backhand', 'forehand'],
+                rating: 4,
+                timesUsed: 56,
+                duration: 15,
+                focusArea: 'Return',
+                courtArea: 'baseline',
+                tags: ['return', 'serve-receive'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '9',
+                title: 'Tiebreaker Simulation',
+                description: 'Play a tiebreaker with match-like pressure',
+                category: 'game',
+                drillType: 'points',
+                difficulty: 'medium',
+                level: 'intermediate',
+                ageGroup: 'teens',
+                needsCoach: false,
+                playerCount: 2,
+                courtsNeeded: 1,
+                ballsNeeded: '0-4',
+                focusAreas: ['serve', 'consistency'],
+                rating: 4,
+                timesUsed: 41,
+                duration: 15,
+                focusArea: 'Mental',
+                courtArea: 'full-court',
+                tags: ['competitive', 'tiebreaker', 'pressure'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '10',
+                title: 'Doubles Poaching Drill',
+                description: 'Practice poaching volleys at the net in doubles formation',
+                category: 'drill',
+                drillType: 'points',
+                difficulty: 'medium',
+                level: 'intermediate',
+                ageGroup: 'adults',
+                needsCoach: false,
+                playerCount: 4,
+                courtsNeeded: 1,
+                ballsNeeded: '4-12',
+                focusAreas: ['volley'],
+                rating: 4,
+                timesUsed: 29,
+                duration: 12,
+                focusArea: 'Doubles',
+                courtArea: 'full-court',
+                tags: ['doubles', 'volley', 'poaching'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '11',
+                title: 'Forehand Inside-Out',
+                description: 'Run around backhand to hit inside-out forehands',
+                category: 'drill',
+                drillType: 'rallies',
+                difficulty: 'hard',
+                level: 'advanced',
+                ageGroup: 'adults',
+                needsCoach: false,
+                playerCount: 2,
+                courtsNeeded: 1,
+                ballsNeeded: '4-12',
+                focusAreas: ['forehand', 'footwork'],
+                rating: 5,
+                timesUsed: 48,
+                duration: 10,
+                focusArea: 'Forehand',
+                courtArea: 'baseline',
+                tags: ['forehand', 'footwork', 'patterns'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '12',
+                title: 'American Doubles',
+                description: 'Two players on one side vs one player on the other, rotating',
+                category: 'game',
+                drillType: 'games',
+                difficulty: 'easy',
+                level: 'beginner',
+                ageGroup: 'kids',
+                needsCoach: true,
+                playerCount: 3,
+                courtsNeeded: 1,
+                ballsNeeded: '0-4',
+                focusAreas: ['consistency', 'footwork'],
+                rating: 4,
+                timesUsed: 65,
+                duration: 20,
+                focusArea: 'Fun',
+                courtArea: 'full-court',
+                tags: ['fun', '3-players', 'rotation'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '13',
+                title: 'Serve Targets',
+                description: 'Hit serves to specific targets in the service box',
+                category: 'basket',
+                drillType: 'baskets',
+                difficulty: 'easy',
+                level: 'beginner',
+                ageGroup: 'teens',
+                needsCoach: true,
+                playerCount: 1,
+                courtsNeeded: 1,
+                ballsNeeded: '12+',
+                focusAreas: ['serve'],
+                rating: 3,
+                timesUsed: 89,
+                duration: 10,
+                focusArea: 'Serve',
+                courtArea: 'service-line',
+                tags: ['serve', 'accuracy', 'solo'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '14',
+                title: 'King of the Court',
+                description: 'Competitive rotation game where winner stays on',
+                category: 'game',
+                drillType: 'games',
+                difficulty: 'medium',
+                level: 'intermediate',
+                ageGroup: 'teens',
+                needsCoach: true,
+                playerCount: 6,
+                courtsNeeded: 1,
+                ballsNeeded: '4-12',
+                focusAreas: ['consistency'],
+                rating: 5,
+                timesUsed: 93,
+                duration: 25,
+                focusArea: 'Competition',
+                courtArea: 'full-court',
+                tags: ['competitive', 'rotation', 'group'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '15',
+                title: 'Passing Shot Practice',
+                description: 'Practice passing shots against a net player',
+                category: 'drill',
+                drillType: 'points',
+                difficulty: 'hard',
+                level: 'pro',
+                ageGroup: 'adults',
+                needsCoach: false,
+                playerCount: 2,
+                courtsNeeded: 1,
+                ballsNeeded: '4-12',
+                focusAreas: ['forehand', 'backhand'],
+                rating: 5,
+                timesUsed: 37,
+                duration: 12,
+                focusArea: 'Passing',
+                courtArea: 'baseline',
+                tags: ['passing', 'defense'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '16',
+                title: 'Mini Tennis',
+                description: 'Play inside the service boxes with smaller court',
+                category: 'game',
+                drillType: 'games',
+                difficulty: 'easy',
+                level: 'beginner',
+                ageGroup: 'kids',
+                needsCoach: false,
+                playerCount: 2,
+                courtsNeeded: 1,
+                ballsNeeded: '0-4',
+                focusAreas: ['consistency', 'volley'],
+                rating: 4,
+                timesUsed: 78,
+                duration: 10,
+                focusArea: 'Touch',
+                courtArea: 'service-box',
+                tags: ['kids', 'mini-tennis', 'touch'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '17',
+                title: 'Two-on-One Baseline',
+                description: 'Two players at the baseline vs one player, working on consistency',
+                category: 'drill',
+                drillType: 'rallies',
+                difficulty: 'medium',
+                level: 'intermediate',
+                ageGroup: 'teens',
+                needsCoach: true,
+                playerCount: 3,
+                courtsNeeded: 1,
+                ballsNeeded: '0-4',
+                focusAreas: ['consistency', 'footwork'],
+                rating: 4,
+                timesUsed: 44,
+                duration: 15,
+                focusArea: 'Endurance',
+                courtArea: 'baseline',
+                tags: ['endurance', '3-players', 'rally'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '18',
+                title: 'Overhead Smash Practice',
+                description: 'Practice overhead smashes from various positions',
+                category: 'basket',
+                drillType: 'baskets',
+                difficulty: 'medium',
+                level: 'intermediate',
+                ageGroup: 'adults',
+                needsCoach: true,
+                playerCount: 2,
+                courtsNeeded: 1,
+                ballsNeeded: '12+',
+                focusAreas: ['volley'],
+                rating: 3,
+                timesUsed: 32,
+                duration: 10,
+                focusArea: 'Overhead',
+                courtArea: 'full-court',
+                tags: ['overhead', 'smash', 'basket'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '19',
+                title: 'Consistency Challenge',
+                description: 'See how many balls you can rally without missing',
+                category: 'drill',
+                drillType: 'rallies',
+                difficulty: 'easy',
+                level: 'beginner',
+                ageGroup: 'kids',
+                needsCoach: false,
+                playerCount: 2,
+                courtsNeeded: 1,
+                ballsNeeded: '0-4',
+                focusAreas: ['consistency'],
+                rating: 3,
+                timesUsed: 67,
+                duration: 10,
+                focusArea: 'Consistency',
+                courtArea: 'baseline',
+                tags: ['consistency', 'rally', 'challenge'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '20',
+                title: 'Serve and Volley Combo',
+                description: 'Serve and immediately come to net for a volley finish',
+                category: 'drill',
+                drillType: 'points',
+                difficulty: 'hard',
+                level: 'pro',
+                ageGroup: 'adults',
+                needsCoach: false,
+                playerCount: 2,
+                courtsNeeded: 1,
+                ballsNeeded: '4-12',
+                focusAreas: ['serve', 'volley', 'footwork'],
+                rating: 5,
+                timesUsed: 25,
+                duration: 15,
+                focusArea: 'Net Play',
+                courtArea: 'full-court',
+                tags: ['serve-volley', 'transition', 'advanced'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+
+            // Sample groups
+            {
+                id: '1',
+                title: 'Crosscourt Rally',
+                description: 'Players hit crosscourt forehands maintaining depth and consistency',
+                category: 'drill',
+                difficulty: 'easy',
+                playerCount: '2',
+                duration: 10,
+                focusArea: 'Forehand',
+                courtArea: 'baseline',
+                tags: ['rally', 'consistency'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '2',
+                title: 'Serve + 1 Attack',
+                description: 'Serve, move forward, and put away the next ball with an aggressive shot',
+                category: 'drill',
+                difficulty: 'medium',
+                playerCount: '2',
+                duration: 15,
+                focusArea: 'Serve',
+                courtArea: 'full-court',
+                tags: ['serve', 'attack', 'net'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '3',
+                title: 'First to 11 Points',
+                description: 'Competitive game playing to 11 points, win by 2',
+                category: 'game',
+                difficulty: 'medium',
+                playerCount: '2',
+                duration: 20,
+                focusArea: 'Match Play',
+                courtArea: 'full-court',
+                tags: ['competitive', 'match-play'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '4',
+                title: 'Volley-Volley Exchanges',
+                description: 'Both players at net hitting volleys back and forth',
+                category: 'drill',
+                difficulty: 'easy',
+                playerCount: '2',
+                duration: 8,
+                focusArea: 'Volley',
+                courtArea: 'service-box',
+                tags: ['volley', 'net-play'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '5',
+                title: 'King of the Court',
+                description: 'Winner stays on, loser rotates out. Competitive rotation game',
+                category: 'game',
+                difficulty: 'hard',
+                playerCount: '4+',
+                duration: 25,
+                focusArea: 'Match Play',
+                courtArea: 'full-court',
+                tags: ['competitive', 'rotation', 'group'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '6',
+                title: 'Down-the-Line Backhand',
+                description: 'Practice hitting down-the-line backhands with precision',
+                category: 'drill',
+                difficulty: 'medium',
+                playerCount: '2',
+                duration: 12,
+                focusArea: 'Backhand',
+                courtArea: 'baseline',
+                tags: ['backhand', 'placement'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '7',
+                title: 'Serve Placement Targets',
+                description: 'Serve to specific targets in service boxes for accuracy',
+                category: 'basket',
+                difficulty: 'easy',
+                playerCount: '1',
+                duration: 15,
+                focusArea: 'Serve',
+                courtArea: 'baseline',
+                tags: ['serve', 'accuracy', 'solo'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '8',
+                title: 'Approach Shot + Volley',
+                description: 'Hit approach shot, move to net, finish with volley',
+                category: 'drill',
+                difficulty: 'hard',
+                playerCount: '2',
+                duration: 15,
+                focusArea: 'Net Play',
+                courtArea: 'full-court',
+                tags: ['approach', 'volley', 'transition'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '9',
+                title: 'Two-on-One Baseline',
+                description: 'One player defends against two opponents from baseline',
+                category: 'drill',
+                difficulty: 'hard',
+                playerCount: '3',
+                duration: 10,
+                focusArea: 'Defense',
+                courtArea: 'baseline',
+                tags: ['defense', 'movement', 'fitness'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '10',
+                title: 'Spanish Drill',
+                description: 'Feed alternating forehands and backhands, player runs side to side',
+                category: 'basket',
+                difficulty: 'medium',
+                playerCount: '2',
+                duration: 8,
+                focusArea: 'Movement',
+                courtArea: 'baseline',
+                tags: ['movement', 'fitness', 'groundstrokes'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '11',
+                title: 'Return of Serve Practice',
+                description: 'Focus on quality returns, positioning and timing',
+                category: 'drill',
+                difficulty: 'medium',
+                playerCount: '2',
+                duration: 12,
+                focusArea: 'Return',
+                courtArea: 'baseline',
+                tags: ['return', 'serve-receive'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '12',
+                title: 'Short Ball Attack',
+                description: 'Recognize short balls and move forward to attack',
+                category: 'drill',
+                difficulty: 'medium',
+                playerCount: '2',
+                duration: 10,
+                focusArea: 'Attack',
+                courtArea: 'mid-court',
+                tags: ['attack', 'recognition', 'approach'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '13',
+                title: 'Tiebreaker Simulation',
+                description: 'Play tiebreakers to practice pressure situations',
+                category: 'points',
+                difficulty: 'hard',
+                playerCount: '2',
+                duration: 15,
+                focusArea: 'Mental',
+                courtArea: 'full-court',
+                tags: ['competitive', 'mental', 'pressure'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '14',
+                title: 'Overhead Smash Practice',
+                description: 'Practice overhead technique with lobs and smashes',
+                category: 'basket',
+                difficulty: 'easy',
+                playerCount: '2',
+                duration: 10,
+                focusArea: 'Overhead',
+                courtArea: 'mid-court',
+                tags: ['overhead', 'smash', 'lob'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '15',
+                title: 'Doubles Poaching Drill',
+                description: 'Net player practices intercepting crosscourt shots',
+                category: 'drill',
+                difficulty: 'hard',
+                playerCount: '4',
+                duration: 12,
+                focusArea: 'Doubles',
+                courtArea: 'full-court',
+                tags: ['doubles', 'poaching', 'net'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '16',
+                title: 'Forehand Inside-Out',
+                description: 'Run around backhand to hit inside-out forehand',
+                category: 'drill',
+                difficulty: 'hard',
+                playerCount: '2',
+                duration: 12,
+                focusArea: 'Forehand',
+                courtArea: 'baseline',
+                tags: ['forehand', 'footwork', 'advanced'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '17',
+                title: 'Serve and Stay Back',
+                description: 'Serve and construct the point from the baseline',
+                category: 'drill',
+                difficulty: 'medium',
+                playerCount: '2',
+                duration: 15,
+                focusArea: 'Serve',
+                courtArea: 'full-court',
+                tags: ['serve', 'baseline', 'tactics'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '18',
+                title: 'American Doubles',
+                description: '2v1 game where the single player serves and plays points',
+                category: 'game',
+                difficulty: 'hard',
+                playerCount: '3',
+                duration: 20,
+                focusArea: 'Match Play',
+                courtArea: 'full-court',
+                tags: ['competitive', 'doubles', 'rotation'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '19',
+                title: 'Drop Shot Defense',
+                description: 'Practice getting to drop shots and recovering position',
+                category: 'drill',
+                difficulty: 'medium',
+                playerCount: '2',
+                duration: 10,
+                focusArea: 'Movement',
+                courtArea: 'full-court',
+                tags: ['drop-shot', 'defense', 'speed'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+            {
+                id: '20',
+                title: 'Consistency Challenge',
+                description: 'See how many consecutive rallies you can complete without error',
+                category: 'points',
+                difficulty: 'easy',
+                playerCount: '2',
+                duration: 15,
+                focusArea: 'Consistency',
+                courtArea: 'baseline',
+                tags: ['rally', 'consistency', 'challenge'],
+                isPublic: true,
+                createdAt: new Date(),
+            },
+        ];
+
+        // Sample groups
+        this.groups = [
+            { id: '1', name: 'College Tennis Coaches', category: 'college', memberCount: 156, description: 'Network for college tennis coaches' },
+            { id: '2', name: 'Junior Development', category: 'juniors', memberCount: 243, description: 'Coaches working with junior players' },
+            { id: '3', name: 'Pro Player Development', category: 'pro', memberCount: 89, description: 'Coaches working with professional players' },
+        ];
+
+        // Sample opportunities
+        this.opportunities = [
+            {
+                id: '1',
+                type: 'looking-for-players',
+                title: 'Looking for UTR 11+ Players',
+                description: 'D1 university program seeking talented players for Fall 2026',
+                level: 'UTR 11-13',
+                location: 'California, USA',
+                active: true,
+                createdAt: new Date(),
+            },
+        ];
+    }
+
+    // Exercises
+    getExercises() { return this.exercises; }
+    getExercise(id: string) { return this.exercises.find(e => e.id === id); }
+    addExercise(exercise: Exercise) { this.exercises.push(exercise); return exercise; }
+    updateExercise(id: string, data: Partial<Exercise>) {
+        const index = this.exercises.findIndex(e => e.id === id);
+        if (index !== -1) {
+            this.exercises[index] = { ...this.exercises[index], ...data };
+            return this.exercises[index];
+        }
+        return null;
+    }
+    deleteExercise(id: string) {
+        this.exercises = this.exercises.filter(e => e.id !== id);
+    }
+
+    // Sessions
+    getSessions() { return this.sessions; }
+    getSession(id: string) { return this.sessions.find(s => s.id === id); }
+    addSession(session: Session) { this.sessions.push(session); return session; }
+    updateSession(id: string, data: Partial<Session>) {
+        const index = this.sessions.findIndex(s => s.id === id);
+        if (index !== -1) {
+            this.sessions[index] = { ...this.sessions[index], ...data };
+            return this.sessions[index];
+        }
+        return null;
+    }
+    deleteSession(id: string) {
+        this.sessions = this.sessions.filter(s => s.id !== id);
+    }
+
+    // Calendar
+    getCalendarEvents() { return this.calendar; }
+    getCalendarEvent(id: string) { return this.calendar.find(e => e.id === id); }
+    addCalendarEvent(event: CalendarEvent) { this.calendar.push(event); return event; }
+    updateCalendarEvent(id: string, data: Partial<CalendarEvent>) {
+        const index = this.calendar.findIndex(e => e.id === id);
+        if (index !== -1) {
+            this.calendar[index] = { ...this.calendar[index], ...data };
+            return this.calendar[index];
+        }
+        return null;
+    }
+    deleteCalendarEvent(id: string) {
+        this.calendar = this.calendar.filter(e => e.id !== id);
+    }
+
+    // Playlists
+    getPlaylists() { return this.playlists; }
+    getPlaylist(id: string) { return this.playlists.find(p => p.id === id); }
+    addPlaylist(playlist: Playlist) { this.playlists.push(playlist); return playlist; }
+    updatePlaylist(id: string, data: Partial<Playlist>) {
+        const index = this.playlists.findIndex(p => p.id === id);
+        if (index !== -1) {
+            this.playlists[index] = { ...this.playlists[index], ...data };
+            return this.playlists[index];
+        }
+        return null;
+    }
+    deletePlaylist(id: string) {
+        this.playlists = this.playlists.filter(p => p.id !== id);
+    }
+
+    // Teams
+    getTeams() { return this.teams; }
+    getTeam(id: string) { return this.teams.find(t => t.id === id); }
+    addTeam(team: Team) { this.teams.push(team); return team; }
+
+    // Messages
+    getMessages() { return this.messages; }
+    addMessage(message: Message) { this.messages.push(message); return message; }
+
+    // Groups
+    getGroups() { return this.groups; }
+    getGroup(id: string) { return this.groups.find(g => g.id === id); }
+
+    // Opportunities
+    getOpportunities() { return this.opportunities; }
+    addOpportunity(opp: Opportunity) { this.opportunities.push(opp); return opp; }
+}
+
+export const dataStore = new DataStore();
