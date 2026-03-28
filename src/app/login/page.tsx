@@ -64,6 +64,13 @@ export default function LoginPage() {
         }
     };
 
+    const handleGuestLogin = () => {
+        document.cookie = "tf_auth_status=guest; path=/; max-age=2592000; SameSite=Lax";
+        // Also update AuthContext directly to prevent infinite redirect loops caused by state desync
+        // We use window.location.href to ensure a clean slate and accurate middleware execution
+        window.location.href = '/';
+    };
+
     return (
         <div className="min-h-screen flex items-center justify-center p-4">
             <motion.div
@@ -131,6 +138,28 @@ export default function LoginPage() {
                         )}
                     </button>
                 </form>
+
+                <div className="mt-8">
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-slate-700"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="bg-slate-800/50 px-2 text-slate-400">Or continue with</span>
+                        </div>
+                    </div>
+
+                    <div className="mt-6">
+                        <button
+                            onClick={handleGuestLogin}
+                            type="button"
+                            className="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 border border-slate-600 shadow-sm"
+                        >
+                            Continue as Guest
+                            <ArrowRight className="w-5 h-5 text-slate-400" />
+                        </button>
+                    </div>
+                </div>
 
                 {/* <div className="mt-8 text-center">
                     <p className="text-slate-400 text-sm">

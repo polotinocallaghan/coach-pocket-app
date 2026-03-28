@@ -13,9 +13,9 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    // Redirección si el usuario está logueado pero intenta ir al login de nuevo
-    if (authCookie === 'authenticated' && isAuthRoute) {
-        return NextResponse.redirect(new URL('/dashboard', request.url));
+    // Redirección si el usuario está logueado o es invitado pero intenta ir al login de nuevo
+    if ((authCookie === 'authenticated' || authCookie === 'guest') && isAuthRoute) {
+        return NextResponse.redirect(new URL('/', request.url));
     }
 
     return NextResponse.next();
